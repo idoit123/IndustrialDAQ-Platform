@@ -1,0 +1,2 @@
+# The simulator uses the 3.6.x datastore and payload APIs.
+pymodbus==3.6.9

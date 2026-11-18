@@ -1,0 +1,103 @@
+<UserControl x:Class="IndustrialDAQ.UI.Views.VisionTaskDialog"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             MinWidth="760" MinHeight="560" Background="Transparent">
+    <UserControl.Resources>
+        <BooleanToVisibilityConverter x:Key="BoolToVisibility"/>
+        <Style x:Key="RecipeButton" TargetType="Button"><Setter Property="Padding" Value="12,7"/><Setter Property="Margin" Value="4,0"/><Setter Property="Cursor" Value="Hand"/></Style>
+    </UserControl.Resources>
+    <Border Background="{DynamicResource CardBgBrush}" BorderBrush="{DynamicResource BorderBrush}" BorderThickness="1" CornerRadius="10" Padding="22">
+        <Grid>
+            <Grid.RowDefinitions><RowDefinition Height="Auto"/><RowDefinition Height="*"/><RowDefinition Height="Auto"/></Grid.RowDefinitions>
+            <Grid>
+                <StackPanel><TextBlock Text="新增视觉任务" FontSize="24" FontWeight="Bold" Foreground="{DynamicResource TextPrimaryBrush}"/><TextBlock Text="选择相机 → 逐个添加算子 → 调整默认参数 → 测试并发布" Foreground="{DynamicResource TextMutedBrush}" Margin="0,5,0,14"/></StackPanel>
+                <Button Content="✕" Command="{Binding CancelCommand}" Width="32" Height="32" HorizontalAlignment="Right" VerticalAlignment="Top" Background="Transparent" BorderThickness="0" Foreground="{DynamicResource TextPrimaryBrush}"/>
+            </Grid>
+            <Grid Grid.Row="1"><Grid.ColumnDefinitions><ColumnDefinition Width="0.85*"/><ColumnDefinition Width="1.55*"/></Grid.ColumnDefinitions>
+                <Border Background="{DynamicResource BrushBgSecondary}" CornerRadius="6" Margin="0,0,14,0" Padding="10">
+                    <Grid>
+                        <Grid.RowDefinitions><RowDefinition Height="Auto"/><RowDefinition Height="*"/><RowDefinition Height="Auto"/><RowDefinition Height="Auto"/></Grid.RowDefinitions>
+                        <Border Padding="4,2,4,9" BorderBrush="{DynamicResource BorderBrush}" BorderThickness="0,0,0,1">
+                            <DockPanel>
+                                <Button DockPanel.Dock="Right" Content="⟳ 获取相机快照" Command="{Binding RefreshTeachingFrameCommand}"
+                                        Padding="11,6" Background="{DynamicResource InfoBrush}" Foreground="White" BorderThickness="0"/>
+                                <StackPanel>
+                                    <TextBlock Text="教学图与区域框选" Foreground="{DynamicResource TextPrimaryBrush}" FontWeight="Bold"/>
+                                    <TextBlock Text="快照固定后再框选，不会受实时画面变化影响" Foreground="{DynamicResource TextMutedBrush}" FontSize="11"/>
+                                </StackPanel>
+                            </DockPanel>
+                        </Border>
+                        <Grid Grid.Row="1" x:Name="ImageSelectionHost" Background="#111827" SizeChanged="OnImageHostSizeChanged">
+                            <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center" IsHitTestVisible="False"
+                                        Visibility="{Binding HasNoPreviewImage, Converter={StaticResource BoolToVisibility}}">
+                                <TextBlock Text="暂无教学图" Foreground="#CBD5E1" FontSize="17" HorizontalAlignment="Center"/>
+                                <TextBlock Text="点击上方“获取相机快照”" Foreground="#94A3B8" Margin="0,5,0,0"/>
+                            </StackPanel>
+                            <Image x:Name="PreviewImageControl" Source="{Binding PreviewImage}" Stretch="Uniform" IsHitTestVisible="False"/>
+                            <Canvas x:Name="RegionOverlay" IsHitTestVisible="False">
+                                <Rectangle x:Name="RoiRegion" Stroke="#22D3EE" StrokeThickness="2" Fill="#1622D3EE"/>
+                                <Rectangle x:Name="TemplateRegion" Stroke="#F59E0B" StrokeThickness="2" Fill="#18F59E0B"/>
+                                <Ellipse x:Name="DragStartMarker" Width="12" Height="12" Fill="#F8FAFC" Stroke="#06B6D4" StrokeThickness="3" Visibility="Collapsed"/>
+                            </Canvas>
+                            <!-- 独立透明输入层直接接收鼠标事件，避免 Thumb 在复杂视觉树中丢失拖动事件。 -->
+                            <Border x:Name="SelectionSurface" Background="Transparent" IsHitTestVisible="{Binding IsRegionDrawing}"
+                                    PreviewMouseLeftButtonDown="OnRegionMouseDown"
+                                    PreviewMouseMove="OnRegionMouseMove"
+                                    PreviewMouseLeftButtonUp="OnRegionMouseUp">
+                                <Border.Style>
+                                    <Style TargetType="Border">
+                                        <Setter Property="Cursor" Value="Arrow"/>
+                                        <Style.Triggers><DataTrigger Binding="{Binding IsRegionDrawing}" Value="True"><Setter Property="Cursor" Value="Cross"/></DataTrigger></Style.Triggers>
+                                    </Style>
+                                </Border.Style>
+                            </Border>
+                            <Border Background="#D90E7490" CornerRadius="4" Padding="10,6" Margin="10"
+                                    HorizontalAlignment="Left" VerticalAlignment="Top" IsHitTestVisible="False"
+                                    Visibility="{Binding IsRegionDrawing, Converter={StaticResource BoolToVisibility}}">
+                                <TextBlock Text="框选模式：拖动框选，或单击起点后再单击终点" Foreground="White"/>
+                            </Border>
+                        </Grid>
+                        <TextBlock Grid.Row="2" Text="蓝框：ROI 搜索区域　橙框：模板教学区域" Foreground="{DynamicResource TextMutedBrush}" HorizontalAlignment="Center" Margin="0,8,0,0"/>
+                        <TextBlock Grid.Row="3" Text="{Binding SelectionInstruction}" Foreground="{DynamicResource InfoBrush}" TextWrapping="Wrap" HorizontalAlignment="Center" Margin="0,5,0,0"/>
+                    </Grid>
+                </Border>
+                <ScrollViewer Grid.Column="1" VerticalScrollBarVisibility="Auto"><StackPanel Margin="2,0,8,0">
+                    <TextBlock Text="① 选择已有相机与任务信息" FontWeight="Bold" Foreground="{DynamicResource InfoBrush}" Margin="0,0,0,8"/>
+                    <TextBlock Text="相机连接参数统一在工作台的“相机配置”中维护，此处只选择任务使用的相机。" Foreground="{DynamicResource TextMutedBrush}" TextWrapping="Wrap" Margin="0,0,0,7"/>
+                    <TextBlock Text="已配置相机" Foreground="{DynamicResource TextSecondaryBrush}"/>
+                    <ComboBox ItemsSource="{Binding ExistingCameras}" SelectedItem="{Binding SelectedCamera}" Padding="8" Margin="0,4,0,8">
+                        <ComboBox.ItemTemplate><DataTemplate><StackPanel Orientation="Horizontal"><TextBlock Text="{Binding Name}" Foreground="{DynamicResource TextPrimaryBrush}" FontWeight="SemiBold"/><TextBlock Text="  ·  " Foreground="{DynamicResource TextMutedBrush}"/><TextBlock Text="{Binding DriverType}" Foreground="{DynamicResource TextMutedBrush}"/></StackPanel></DataTemplate></ComboBox.ItemTemplate>
+                    </ComboBox>
+                    <Grid><Grid.ColumnDefinitions><ColumnDefinition/><ColumnDefinition/></Grid.ColumnDefinitions><StackPanel Margin="0,0,5,0"><TextBlock Text="任务名称"/><TextBox Text="{Binding TaskName}" Padding="7" Margin="0,4,0,8"/></StackPanel><StackPanel Grid.Column="1" Margin="5,0,0,0"><TextBlock Text="产品编码"/><TextBox Text="{Binding ProductCode}" Padding="7" Margin="0,4,0,8"/></StackPanel></Grid>
+                    <Separator Margin="0,8"/>
+                    <TextBlock Text="② 顺序式视觉配方" FontWeight="Bold" Foreground="{DynamicResource InfoBrush}" Margin="0,0,0,6"/>
+                    <TextBlock Text="不需要拖拽：从常用算子库选择后逐个添加，系统按列表从上到下执行。" Foreground="{DynamicResource TextMutedBrush}" Margin="0,0,0,8"/>
+                    <Grid><Grid.ColumnDefinitions><ColumnDefinition/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions><ComboBox ItemsSource="{Binding AvailableOperators}" SelectedItem="{Binding SelectedAvailableOperator}" DisplayMemberPath="DisplayName" Padding="7"/><Button Grid.Column="1" Content="＋ 添加算子" Command="{Binding AddOperatorCommand}" Padding="14,7" Margin="8,0,0,0" Background="{DynamicResource InfoBrush}" Foreground="White" BorderThickness="0"/></Grid>
+                    <DataGrid ItemsSource="{Binding Operators}" SelectedItem="{Binding SelectedOperator}" AutoGenerateColumns="False" IsReadOnly="True" CanUserAddRows="False" Height="170" Margin="0,8,0,6" HeadersVisibility="Column" SelectionMode="Single">
+                        <DataGrid.Columns><DataGridTextColumn Header="#" Binding="{Binding Order}" Width="42"/><DataGridTextColumn Header="算子" Binding="{Binding DisplayName}" Width="130"/><DataGridTextColumn Header="类别" Binding="{Binding Category}" Width="110"/><DataGridTextColumn Header="作用" Binding="{Binding Description}" Width="*"/></DataGrid.Columns>
+                    </DataGrid>
+                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Right"><Button Style="{StaticResource RecipeButton}" Content="上移" Command="{Binding MoveUpCommand}"/><Button Style="{StaticResource RecipeButton}" Content="下移" Command="{Binding MoveDownCommand}"/><Button Style="{StaticResource RecipeButton}" Content="删除" Command="{Binding RemoveOperatorCommand}" Foreground="{DynamicResource DangerBrush}"/></StackPanel>
+                    <TextBlock Text="③ 当前算子参数" FontWeight="Bold" Foreground="{DynamicResource InfoBrush}" Margin="0,12,0,6"/>
+                    <TextBlock Text="{Binding SelectedOperator.Description}" Foreground="{DynamicResource TextMutedBrush}" TextWrapping="Wrap"/>
+                    <Button Content="{Binding RegionSelectionButtonText}" Command="{Binding StartRegionSelectionCommand}" Visibility="{Binding CanDrawRegion, Converter={StaticResource BoolToVisibility}}" Padding="12,9" Margin="0,7,0,0" Background="#0E7490" Foreground="White" BorderThickness="0"/>
+                    <TextBlock Text="当前算子完整参数" Foreground="{DynamicResource TextSecondaryBrush}" FontWeight="SemiBold" Margin="0,9,0,4"/>
+                    <DataGrid ItemsSource="{Binding SelectedOperator.DetailedParameters}" AutoGenerateColumns="False" CanUserAddRows="False" IsReadOnly="True" Height="120" HeadersVisibility="Column">
+                        <DataGrid.Columns><DataGridTextColumn Header="参数" Binding="{Binding DisplayName}" Width="120"/><DataGridTextColumn Header="当前值" Binding="{Binding Value}" Width="150"/><DataGridTextColumn Header="用途说明" Binding="{Binding Help}" Width="*"/></DataGrid.Columns>
+                    </DataGrid>
+                    <TextBlock Text="可调整参数" Foreground="{DynamicResource TextSecondaryBrush}" FontWeight="SemiBold" Margin="0,9,0,4"/>
+                    <DataGrid ItemsSource="{Binding SelectedOperator.EditableParameters}" AutoGenerateColumns="False" CanUserAddRows="False" Height="145" Margin="0,6,0,0" HeadersVisibility="Column">
+                        <DataGrid.Columns><DataGridTextColumn Header="参数" Binding="{Binding DisplayName}" IsReadOnly="True" Width="120"/><DataGridTextColumn Header="值" Binding="{Binding Value, UpdateSourceTrigger=PropertyChanged}" Width="150"/><DataGridTextColumn Header="说明" Binding="{Binding Help}" IsReadOnly="True" Width="*"/></DataGrid.Columns>
+                    </DataGrid>
+                    <CheckBox Content="NG 原图自动保存" IsChecked="{Binding SaveNgImage}" Margin="0,10,0,0"/>
+                    <Button Content="采集模板并测试当前配方" Command="{Binding TeachCommand}" Padding="12,9" Margin="0,10,0,0" Background="{DynamicResource InfoBrush}" Foreground="White" BorderThickness="0"/>
+                    <TextBlock Text="{Binding StatusText}" TextWrapping="Wrap" Foreground="{DynamicResource TextSecondaryBrush}" Margin="0,8,0,0"/>
+                </StackPanel></ScrollViewer>
+            </Grid>
+            <Grid Grid.Row="2" Margin="0,16,0,0">
+                <Grid.ColumnDefinitions><ColumnDefinition/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions>
+                <TextBlock Text="{Binding StatusText}" Foreground="{DynamicResource TextSecondaryBrush}" TextWrapping="Wrap" VerticalAlignment="Center" Margin="0,0,24,0"/>
+                <StackPanel Grid.Column="1" Orientation="Horizontal"><Button Content="返回工作台" Command="{Binding CancelCommand}" Padding="20,8" Margin="0,0,8,0"/><Button Content="{Binding SaveButtonText}" Command="{Binding SaveCommand}" Padding="20,8" Background="{DynamicResource SuccessBrush}" Foreground="White" BorderThickness="0"/></StackPanel>
+            </Grid>
+        </Grid>
+    </Border>
+</UserControl>

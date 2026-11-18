@@ -1,0 +1,131 @@
+<Window x:Class="WpfPractice.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:prism="http://prismlibrary.com/"
+        prism:ViewModelLocator.AutoWireViewModel="True"
+        Title="WPF 练习"
+        Width="650" Height="650"
+        WindowStartupLocation="CenterScreen">
+
+    <Grid Margin="24">
+
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="100"/>
+            <ColumnDefinition Width="*"/>
+        </Grid.ColumnDefinitions>
+
+        <TextBlock Grid.Row="0"
+                   Grid.Column="0"
+                   Text="设备："
+                   FontSize="22"/>
+
+        <TextBlock Grid.Row="0"
+                   Grid.Column="1"
+                   Text="{Binding DeviceLocation}"
+                   FontSize="22"
+                   Margin="0,0,0,16"/>
+
+        <TextBlock Grid.Row="1"
+                   Grid.Column="0"
+                   Text="编辑："
+                   FontSize="22"/>
+
+        <TextBox Grid.Row="1"
+                 Grid.Column="1"
+                 Text="{Binding DeviceLocation,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}"
+                 FontSize="20"
+                 Margin="0,0,0,16"/>
+
+        <StackPanel Grid.Row="2"
+            Grid.Column="1">
+
+            <TextBlock x:Name="StatusText"
+           Text="{Binding SelectedRecord.Location}"/>
+
+            <DataGrid ItemsSource="{Binding LocationHistory}"
+          SelectedItem="{Binding SelectedRecord, Mode=TwoWay}"
+          SelectionMode="Single"
+          SelectionUnit="FullRow"
+          AutoGenerateColumns="False"
+          IsReadOnly="False"
+          Height="100">
+
+                <DataGrid.Columns>
+                    <DataGridTextColumn Header="设备名称"
+                    Binding="{Binding Name}"
+                    IsReadOnly="True"
+                    Width="*"/>
+
+                    <DataGridTextColumn Header="原位置"
+                    Binding="{Binding Location,
+                                      Mode=TwoWay,
+                                      UpdateSourceTrigger=PropertyChanged}"
+                    Width="*"/>
+                </DataGrid.Columns>
+
+            </DataGrid>
+            <TreeView ItemsSource="{Binding DeviceRoots}"
+        Height="140"
+        Margin="0,8,0,0">
+
+                <TreeView.ItemTemplate>
+                    <HierarchicalDataTemplate ItemsSource="{Binding Children}">
+
+                        <StackPanel Orientation="Horizontal">
+
+                            <TextBlock Text="{Binding Name}"
+                   VerticalAlignment="Center"/>
+
+                            <Button Content="查看"
+                Margin="8,0,0,0"
+                Command="{Binding DataContext.ShowNodeCommand,
+                    RelativeSource={RelativeSource AncestorType=TreeView}}"
+                CommandParameter="{Binding}"/>
+
+                        </StackPanel>
+
+                    </HierarchicalDataTemplate>
+                </TreeView.ItemTemplate>
+
+            </TreeView>
+            <TextBlock Text="{Binding ViewedNode.Name}"
+           Margin="0,8,0,0"/>
+            <ContentControl
+    prism:RegionManager.RegionName="PracticeRegion"
+    Height="80"
+    Margin="0,8,0,0"/>
+        </StackPanel>
+  
+        <StackPanel Grid.Row="3"
+            Grid.Column="1"
+            Orientation="Horizontal">
+
+            <Button Content="重置并记录"
+            Command="{Binding ResetLocationCommand}"
+            Height="42"
+            Padding="10,0"
+            Margin="0,0,8,0"/>
+
+            <Button Content="恢复选中位置"
+             CommandParameter="{Binding SelectedRecord}"
+            Command="{Binding RestoreLocationCommand}"
+            Height="42"
+            Padding="10,0"/>
+            <Button Content="删除选中位置"
+            CommandParameter="{Binding SelectedRecord}"
+            Command="{Binding DeleteLocationCommand}"
+            Height="42"
+            Padding="10,0"
+            Margin="8,0,0,0"/>
+            
+        </StackPanel>
+
+    </Grid>
+</Window>

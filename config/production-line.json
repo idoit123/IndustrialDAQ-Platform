@@ -1,0 +1,283 @@
+[
+  {
+    "id": "plc-s1500-01",
+    "name": "灌装产线 S7-1500 PLC",
+    "driverType": "OpcUA",
+    "ipAddress": "192.168.3.10",
+    "port": 4840,
+    "stationAddress": 1,
+    "cpuSlot": 1,
+    "cycleTimeMs": 500,
+    "timeoutMs": 3000,
+    "retryCount": 3,
+    "description": "灌装产线主控 PLC (S7-1500)",
+    "tags": [
+      {
+        "id": "tag-line-start",
+        "name": "Line.Start",
+        "opcUaAddress": "ns=3;s=\"ControlCmd\".\"Line.Start\"",
+        "modbusAddress": "00001",
+        "s7Address": "DB1.DBX0.0",
+        "dataType": "Bool",
+        "access": "ReadWrite",
+        "description": "启动命令"
+      },
+      {
+        "id": "tag-line-stop",
+        "name": "Line.Stop",
+        "opcUaAddress": "ns=3;s=\"ControlCmd\".\"Line.Stop\"",
+        "modbusAddress": "00002",
+        "s7Address": "DB1.DBX0.1",
+        "dataType": "Bool",
+        "access": "ReadWrite",
+        "description": "停止命令"
+      },
+      {
+        "id": "tag-line-automode",
+        "name": "Line.AutoMode",
+        "opcUaAddress": "ns=3;s=\"ControlCmd\".\"Line.AutoMode\"",
+        "modbusAddress": "00003",
+        "s7Address": "DB1.DBX0.2",
+        "dataType": "Bool",
+        "access": "ReadWrite",
+        "description": "自动/手动模式"
+      },
+      {
+        "id": "tag-line-estop",
+        "name": "Line.EStop",
+        "opcUaAddress": "ns=3;s=\"ControlCmd\".\"Line.EStop\"",
+        "modbusAddress": "00004",
+        "s7Address": "DB1.DBX0.3",
+        "dataType": "Bool",
+        "access": "ReadWrite",
+        "description": "急停",
+        "templateId": "dp-line-estop"
+      },
+      {
+        "id": "tag-filling-setlevel",
+        "name": "Filling.SetLevel",
+        "opcUaAddress": "ns=3;s=\"ControlCmd\".\"Filling.SetLevel\"",
+        "modbusAddress": "40001",
+        "s7Address": "DB1.DBD4",
+        "dataType": "Float32",
+        "access": "ReadWrite",
+        "description": "设定灌装液位 (mL)"
+      },
+      {
+        "id": "tag-conveyor-setspeed",
+        "name": "Conveyor.SetSpeed",
+        "opcUaAddress": "ns=3;s=\"ControlCmd\".\"Conveyor.SetSpeed\"",
+        "modbusAddress": "40003",
+        "s7Address": "DB1.DBD8",
+        "dataType": "Float32",
+        "access": "ReadWrite",
+        "description": "设定传送速度 (m/min)"
+      },
+      {
+        "id": "tag-line-running",
+        "name": "Line.Running",
+        "opcUaAddress": "ns=3;s=\"ProcessData\".\"Line.Running\"",
+        "modbusAddress": "10001",
+        "s7Address": "DB1.DBX2.0",
+        "dataType": "Bool",
+        "access": "Read",
+        "description": "产线运行状态",
+        "templateId": "dp-line-running"
+      },
+      {
+        "id": "tag-line-alarmactive",
+        "name": "Line.AlarmActive",
+        "opcUaAddress": "ns=3;s=\"ProcessData\".\"Line.AlarmActive\"",
+        "modbusAddress": "10002",
+        "s7Address": "DB1.DBX2.1",
+        "dataType": "Bool",
+        "access": "Read",
+        "description": "报警激活状态"
+      },
+      {
+        "id": "tag-filling-actuallevel",
+        "name": "Filling.ActualLevel",
+        "opcUaAddress": "ns=3;s=\"ProcessData\".\"Filling.ActualLevel\"",
+        "modbusAddress": "30001",
+        "s7Address": "DB1.DBD12",
+        "dataType": "Float32",
+        "access": "Read",
+        "description": "实际灌装液位 (mL)",
+        "templateId": "dp-filling-level"
+      },
+      {
+        "id": "tag-filling-valveopen",
+        "name": "Filling.ValveOpen",
+        "opcUaAddress": "ns=3;s=\"ProcessData\".\"Filling.ValveOpen\"",
+        "modbusAddress": "10003",
+        "s7Address": "DB1.DBX4.0",
+        "dataType": "Bool",
+        "access": "Read",
+        "description": "灌装阀状态",
+        "templateId": "dp-filling-valve"
+      },
+      {
+        "id": "tag-conveyor-actualspeed",
+        "name": "Conveyor.ActualSpeed",
+        "opcUaAddress": "ns=3;s=\"ProcessData\".\"Conveyor.ActualSpeed\"",
+        "modbusAddress": "30003",
+        "s7Address": "DB1.DBD16",
+        "dataType": "Float32",
+        "access": "Read",
+        "description": "实际传送速度 (m/min)",
+        "templateId": "dp-conveyor-speed"
+      },
+      {
+        "id": "tag-conveyor-running",
+        "name": "Conveyor.Running",
+        "opcUaAddress": "ns=3;s=\"ProcessData\".\"Conveyor.Running\"",
+        "modbusAddress": "10004",
+        "s7Address": "DB1.DBX6.0",
+        "dataType": "Bool",
+        "access": "Read",
+        "description": "传送带运行状态"
+      },
+      {
+        "id": "tag-line-totalcount",
+        "name": "Line.TotalCount",
+        "opcUaAddress": "ns=3;s=\"ProcessData\".\"Line.TotalCount\"",
+        "modbusAddress": "30005",
+        "s7Address": "DB1.DBD20",
+        "dataType": "Int32",
+        "access": "Read",
+        "description": "总产量计数",
+        "templateId": "dp-line-count"
+      }
+    ]
+  },
+  {
+    "id": "modbus-PLC",
+    "name": "Modbus-PLC",
+    "driverType": "Modbus",
+    "ipAddress": "127.0.0.1",
+    "port": 502,
+    "stationAddress": 1,
+    "cpuSlot": 0,
+    "cycleTimeMs": 1000,
+    "timeoutMs": 3000,
+    "retryCount": 3,
+    "description": "Modbus Slave (西门子 MB_SERVER 严格对齐版)",
+    "tags": [
+      {
+        "id": "mb-coil-start",
+        "name": "Line.Start",
+        "modbusAddress": "40013",
+        "dataType": "Bool",
+        "bitIndex": 0,
+        "access": "ReadWrite",
+        "description": "启动命令 → HR_Control.%X0 (DB_Modbus_Server 字节 24 / 寄存器 40013)"
+      },
+      {
+        "id": "mb-coil-stop",
+        "name": "Line.Stop",
+        "modbusAddress": "40013",
+        "dataType": "Bool",
+        "bitIndex": 1,
+        "access": "ReadWrite",
+        "description": "停止命令 → HR_Control.%X1"
+      },
+      {
+        "id": "mb-coil-auto",
+        "name": "Line.AutoMode",
+        "modbusAddress": "40013",
+        "dataType": "Bool",
+        "bitIndex": 2,
+        "access": "ReadWrite",
+        "description": "自动模式 → HR_Control.%X2"
+      },
+      {
+        "id": "mb-coil-estop",
+        "name": "Line.EStop",
+        "modbusAddress": "40013",
+        "dataType": "Bool",
+        "bitIndex": 3,
+        "access": "ReadWrite",
+        "description": "急停 → HR_Control.%X3"
+      },
+      {
+        "id": "mb-di-running",
+        "name": "Line.Running",
+        "modbusAddress": "40014",
+        "dataType": "Bool",
+        "bitIndex": 0,
+        "access": "Read",
+        "description": "运行状态 ← HR_Status.%X0 (DB_Modbus_Server 字节 26 / 寄存器 40014)"
+      },
+      {
+        "id": "mb-di-alarm",
+        "name": "Line.AlarmActive",
+        "modbusAddress": "40014",
+        "dataType": "Bool",
+        "bitIndex": 1,
+        "access": "Read",
+        "description": "报警状态 ← HR_Status.%X1"
+      },
+      {
+        "id": "mb-di-valve",
+        "name": "Filling.ValveOpen",
+        "modbusAddress": "40014",
+        "dataType": "Bool",
+        "bitIndex": 2,
+        "access": "Read",
+        "description": "灌装阀 ← HR_Status.%X2"
+      },
+      {
+        "id": "mb-di-conveyor",
+        "name": "Conveyor.Running",
+        "modbusAddress": "40014",
+        "dataType": "Bool",
+        "bitIndex": 3,
+        "access": "Read",
+        "description": "传送带运行 ← HR_Status.%X3"
+      },
+      {
+        "id": "mb-hr-setlevel",
+        "name": "Filling.SetLevel",
+        "modbusAddress": "40001",
+        "dataType": "Float32",
+        "access": "ReadWrite",
+        "description": "设定液位 (HR 0-1)"
+      },
+      {
+        "id": "mb-hr-setspeed",
+        "name": "Conveyor.SetSpeed",
+        "modbusAddress": "40003",
+        "dataType": "Float32",
+        "access": "ReadWrite",
+        "description": "设定速度 (HR 2-3)"
+      },
+      {
+        "id": "mb-ir-level",
+        "name": "Filling.ActualLevel",
+        "modbusAddress": "40006",
+        "dataType": "Float32",
+        "access": "Read",
+        "description": "实际液位 (HR 5-6)",
+        "templateId": "dp-mb-level"
+      },
+      {
+        "id": "mb-ir-speed",
+        "name": "Conveyor.ActualSpeed",
+        "modbusAddress": "40008",
+        "dataType": "Float32",
+        "access": "Read",
+        "description": "实际速度 (HR 7-8)",
+        "templateId": "dp-mb-speed"
+      },
+      {
+        "id": "mb-ir-count",
+        "name": "Line.TotalCount",
+        "modbusAddress": "40010",
+        "dataType": "Int32",
+        "access": "Read",
+        "description": "总产量 (HR 9-10)",
+        "templateId": "dp-mb-count"
+      }
+    ]
+  }
+]
